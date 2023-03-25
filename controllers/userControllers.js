@@ -16,8 +16,8 @@ module.exports= {
         });
     },
     //Get user by ID
-    getUserById({params}, res) {
-        User.findOne({_id: params.id })
+    getUserById(req, res) {
+        User.findOne({_id: req.params.userId })
         .populate({path: 'thoughts', select: '-__v'})
         .populate({path: 'friends', select: '-__v'})
         .select('-__v')
@@ -40,8 +40,8 @@ module.exports= {
         .catch(err => res.status(400).json(err));
     },
     //Update user by ID
-    updateUser({params, body}, res) {
-        User.findOneAndUpdate({_id: params.id}, body, {new: true, runValidators: true})
+    updateUser(req, res) {
+        User.findOneAndUpdate({_id: req.params.userId}, {$set: req.body}, {new: true, runValidators: true})
         .then(dbUserData => {
             if(!dbUserData) {
                 res.status(404).json({message: 'No User with this particular ID!'});
@@ -52,8 +52,8 @@ module.exports= {
         .catch(err => res.json(err))
     },
     //Delete user by ID
-    deleteUser({params}, res) {
-        User.findOneAndDelete({_id: params.id})
+    deleteUser(req, res) {
+        User.findOneAndDelete({_id: req.params.userId})
         .then(dbUserData => {
             if(!dbUserData) {
                 res.status(404).json({message: 'No User with this particular ID!'});
@@ -65,8 +65,12 @@ module.exports= {
     },
 
     //Add friend
-    addFriend({params}, res) {
-        User.findOneAndUpdate({_id: params.id}, {$push: { friends: params.friendId}}, {new: true})
+    addFriend(req, res) {
+        User.findOneAndUpdate(
+            {_id: req.params.userId}, 
+            {$push: { friends: req.params.friendId}}, 
+            {new: true})
+
         .populate({path: 'friends', select: ('-__v')})
         .select('-__v')
         .then(dbUserData => {
@@ -80,8 +84,12 @@ module.exports= {
     },
 
       //Delete friend
-    deleteFriend({ params }, res) {
-        User.findOneAndUpdate({_id: params.id}, {$pull: { friends: params.friendId}}, {new: true})
+    deleteFriend(req, res) {
+        User.findOneAndUpdate(
+            {_id: req.params.userId}, 
+            {$pull: { friends: req.params.friendId}}, 
+            {new: true})
+            
         .populate({path: 'friends', select: '-__v'})
         .select('-__v')
         .then(dbUserData => {
