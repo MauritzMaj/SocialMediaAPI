@@ -21,7 +21,7 @@ createThought({params, body}, res) {
     .then(({_id}) => {
         return User.findOneAndUpdate(
             { _id: params.userId}, 
-            {$addToSet: {thought: _id}}, 
+            {$push: {thought: _id}}, 
             {new: true}
             );
     })
@@ -85,7 +85,11 @@ getThoughtsById({params}, res) {
 //Add a reaction
 
 addReaction({params, body}, res) {
-    Thought.findOneAndUpdate({_id: params.thoughtId}, {$push: {reactions: body}}, {new: true, runValidators: true})
+    Thought.findOneAndUpdate(
+        {_id: params.thoughtId}, 
+        {$push: {reactions: body}}, 
+        {new: true, runValidators: true})
+        
     .populate({path: 'reactions', select: '-__v'})
     .select('-__v')
     .then(dbThoughtsData => {
@@ -105,7 +109,7 @@ deleteReaction({params}, res) {
         {_id: params.thoughtId}, 
         {$pull: {reaction: {reactionId: params.reactionId}}}, 
         {new : true})
-        
+
     .then(dbThoughtsData => {
         if (!dbThoughtsData) {
             res.status(404).json({message: 'No thoughts with this particular ID!'});
