@@ -6,7 +6,7 @@ module.exports= {
     //Get all users
     getAllUsers(req, res) {
         User.find({})
-        .populate({path: 'thoughts', select: '-__v'})
+        .populate({path: 'Thought', select: '-__v'})
         .populate({path: 'friends', select: '-__v'})
         .select('-__v')
         .then(dbUsersData => res.json(dbUsersData))
@@ -18,7 +18,7 @@ module.exports= {
     //Get user by ID
     getUserById({params}, res) {
         User.findOne({_id: params.id })
-        .populate({path: 'thoughts', select: '-__v'})
+        .populate({path: 'Thought', select: '-__v'})
         .populate({path: 'friends', select: '-__v'})
         .select('-__v')
         .then(dbUserData => {
